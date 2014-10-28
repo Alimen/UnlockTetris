@@ -14,94 +14,134 @@ public class GameManager : MonoBehaviour
 
 	// Pieces & prefabs
 	Piece curPiece = null, nxtPiece = null;
-	public Transform pieceO;
-	public Transform pieceT;
-	public Transform pieceJ;
-	public Transform pieceL;
-	public Transform pieceS;
-	public Transform pieceZ;
-	public Transform pieceI;
-	public Transform pieceR;
-	List<Transform> pieces = new List<Transform> ();
+	public List<Transform> pieces = new List<Transform> ();
 
 	// Timer
 	int level;
 	int line;
-	float downDelay;
-	float downTimer;
+	float autoDownDelay;
+	float autoDownTimer;
 
-	// Key map
-	float inputDelay;
-	float inputTimer;
+	// Key map & repeat timer
+	const float startDelay = 0.12f;
+	const float delayDecay = 0.8f;
 	bool leftKeyDown, rightKeyDown, downKeyDown;
+	float leftDelay, rightDelay, downDelay;
+	float leftTimer, rightTimer, downTimer;
+	bool leftFlag, rightFlag, downFlag;
 
 	void Start ()
 	{
 		scoreBoard = GameObject.Find ("ScoreBoard").GetComponent<ScoreBoard> ();
 		parameters = GameObject.Find ("Parameters").GetComponent<Parameters> ();
 		board = GameObject.Find ("Board").GetComponent<Board> ();
+		parameters.initialize ();
 		StartCoroutine (game ());
 	}
 
 	void Update ()
 	{
-		applyParameters ();
-
+		// Left arrow
 		if (Input.GetKeyDown (KeyCode.LeftArrow)) {
 			leftKeyDown = true;
+			leftFlag = true;
+			leftDelay = startDelay;
+			leftTimer = 0;
 		}
 		if (Input.GetKeyUp (KeyCode.LeftArrow)) {
 			leftKeyDown = false;
 		}
+		
+		// Right arrow
 		if (Input.GetKeyDown (KeyCode.RightArrow)) {
 			rightKeyDown = true;
+			rightFlag = true;
+			rightDelay = startDelay;
+			rightTimer = 0;
 		}
 		if (Input.GetKeyUp (KeyCode.RightArrow)) {
 			rightKeyDown = false;
 		}
+		
+		// Down arrow
 		if (Input.GetKeyDown (KeyCode.DownArrow)) {
 			downKeyDown = true;
+			downFlag = true;
+			downDelay = startDelay;
+			downTimer = 0;
 		}
 		if (Input.GetKeyUp (KeyCode.DownArrow)) {
 			downKeyDown = false;
+		}
+	}
+
+	void checkKeyDelay ()
+	{
+		if (leftKeyDown) {
+			leftTimer += Time.deltaTime;
+			if (leftTimer > leftDelay) {
+				leftFlag = true;
+				leftTimer = 0;
+				leftDelay *= delayDecay;
+			}
+		}
+		if (rightKeyDown) {
+			rightTimer += Time.deltaTime;
+			if (rightTimer > rightDelay) {
+				rightFlag = true;
+				rightTimer = 0;
+				rightDelay *= delayDecay;
+			}
+		}
+		if (downKeyDown) {
+			downTimer += Time.deltaTime;
+			if (downTimer > downDelay) {
+				downFlag = true;
+				downTimer = 0;
+				downDelay *= delayDecay;
+			}
 		}
 	}
 	
 	IEnumerator game ()
 	{
 		// Initializing and start intro. sequence
-		applyParameters ();
 		initialize ();
 		
 		while (true) {
 			createPiece ();
-			inputTimer = 0;
-			downTimer = 0;
+			leftDelay = startDelay;
+			rightDelay = startDelay;
+			downDelay = startDelay;
+			autoDownTimer = 0;
 
 			while (true) {
 				if (Input.GetKeyDown (KeyCode.UpArrow)) {
 					curPiece.rotate ();
 				}
 
-				inputTimer += Time.deltaTime;
-				if (inputTimer >= inputDelay) {
-					inputTimer = 0;
-					if (leftKeyDown && curPiece.checkAvailable (-1, 0)) {
+				checkKeyDelay ();
+				if (leftFlag) {
+					leftFlag = false;
+					if (curPiece.checkAvailable (-1, 0)) {
 						curPiece.x--;
 					}
-					if (rightKeyDown && curPiece.checkAvailable (1, 0)) {
+				}
+				if (rightFlag) {
+					rightFlag = false;
+					if (curPiece.checkAvailable (1, 0)) {
 						curPiece.x++;
 					}
-					if (downKeyDown) {
-						if (!moveDown ()) {
-							break;
-						}
+				}
+				if (downFlag) {
+					downFlag = false;
+					if (!moveDown ()) {
+						break;
 					}
 				}
 
-				downTimer += Time.deltaTime;
-				if (downTimer >= downDelay) {
-					downTimer = 0;
+				autoDownTimer += Time.deltaTime;
+				if (autoDownTimer >= autoDownDelay) {
 					if (!moveDown ()) {
 						break;
 					}
@@ -140,8 +180,7 @@ public class GameManager : MonoBehaviour
 		createPiece ();
 		level = 1;
 		line = 0;
-		downDelay = downDelayByLevel (level);
-		inputDelay = 0.1f;
+		autoDownDelay = autoDownDelayByLevel (level);
 		leftKeyDown = false;
 		rightKeyDown = false;
 		downKeyDown = false;
@@ -150,10 +189,10 @@ public class GameManager : MonoBehaviour
 	void levelUp ()
 	{
 		level++;
-		downDelay = downDelayByLevel (level);
+		autoDownDelay = autoDownDelayByLevel (level);
 	}
 
-	float downDelayByLevel (int lv)
+	float autoDownDelayByLevel (int lv)
 	{
 		return 0.6f * Mathf.Pow (0.9f, lv);
 	}
@@ -172,38 +211,11 @@ public class GameManager : MonoBehaviour
 	{
 		if (curPiece.checkAvailable (0, 1)) {
 			curPiece.y++;
+			autoDownTimer = 0;
 			return true;
 		} else {
 			curPiece.updatePosition ();
 			return false;
-		}
-	}
-
-	void applyParameters ()
-	{
-		if (!parameters.change) {
-			return;
-		}
-		parameters.change = false;
-
-		pieces.Clear ();
-		if (parameters.pieceOT) {
-			pieces.Add (pieceO);
-			pieces.Add (pieceT);
-		}
-		if (parameters.pieceJL) {
-			pieces.Add (pieceJ);
-			pieces.Add (pieceL);
-		}
-		if (parameters.pieceSZ) {
-			pieces.Add (pieceS);
-			pieces.Add (pieceZ);
-		}
-		if (parameters.pieceI) {
-			pieces.Add (pieceI);
-		}
-		if (parameters.pieceR) {
-			pieces.Add (pieceR);
 		}
 	}
 }

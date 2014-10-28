@@ -1,11 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Parameters : MonoBehaviour
 {
+	GameManager gameManager;
+
 	public int score;
 	public int itemBought;
-	public bool change;
 
 	public bool keyRL;
 	public bool keyUD;
@@ -19,16 +21,26 @@ public class Parameters : MonoBehaviour
 	public bool highResolution;
 	public bool thirdDimension;
 
-	void Awake ()
+	public Transform prefabPieceO;
+	public Transform prefabPieceT;
+	public Transform prefabPieceJ;
+	public Transform prefabPieceL;
+	public Transform prefabPieceS;
+	public Transform prefabPieceZ;
+	public Transform prefabPieceI;
+	public Transform prefabPieceR;
+
+	public void initialize ()
 	{
 		reset ();
+		gameManager = GameObject.Find ("GameManager").GetComponent<GameManager> ();
+		applyParameters ();
 	}
 
 	public void reset ()
 	{
 		score = 0;
 		itemBought = 0;
-		change = true;
 
 		keyRL = false;
 		keyUD = false;
@@ -41,5 +53,31 @@ public class Parameters : MonoBehaviour
 
 		highResolution = false;
 		thirdDimension = true;
+	}
+	
+	
+	public void applyParameters ()
+	{
+		List<Transform> pieces = gameManager.pieces;
+
+		pieces.Clear ();
+		if (pieceOT) {
+			pieces.Add (prefabPieceO);
+			pieces.Add (prefabPieceT);
+		}
+		if (pieceJL) {
+			pieces.Add (prefabPieceJ);
+			pieces.Add (prefabPieceL);
+		}
+		if (pieceSZ) {
+			pieces.Add (prefabPieceS);
+			pieces.Add (prefabPieceZ);
+		}
+		if (pieceI) {
+			pieces.Add (prefabPieceI);
+		}
+		if (pieceR) {
+			pieces.Add (prefabPieceR);
+		}
 	}
 }

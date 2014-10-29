@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 public class PieceI : Piece
 {
-	public override void initialize ()
+	public override void initialize (bool isHighRes)
 	{
-		base.initialize ();
+		base.initialize (isHighRes);
 		content.AddRange (new int[] {
 			0,0,0,0,
 			1,1,1,1,
@@ -17,7 +17,7 @@ public class PieceI : Piece
 		y = 0;
 		width = 4;
 		color = new Color (0.9f, 0.1f, 0.1f);
-		instantiateBricks ();
+		instantiateBricks (isHighRes);
 	}
 
 	public override void rotate ()

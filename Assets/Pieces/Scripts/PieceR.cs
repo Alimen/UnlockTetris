@@ -5,10 +5,10 @@ using System.Collections.Generic;
 public class PieceR : Piece
 {
 	const int pieceWidth = 5;
-
-	public override void initialize ()
+	
+	public override void initialize (bool isHighRes)
 	{
-		base.initialize ();
+		base.initialize (isHighRes);
 		content.AddRange (new int[] {
 			0,0,0,0,0,
 			0,0,0,0,0,
@@ -24,7 +24,7 @@ public class PieceR : Piece
 		y = 0;
 		width = pieceWidth;
 		color = new Color (0.1f, 0.1f, 0.1f);
-		instantiateBricks ();
+		instantiateBricks (isHighRes);
 	}
 
 	void generateRandomOneBrick ()

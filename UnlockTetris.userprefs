@@ -1,11 +1,9 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Game\GameManager.cs">
     <Files>
-      <File FileName="Assets\Game\Parameters.cs" Line="43" Column="18" />
-      <File FileName="Assets\Game\GameManager.cs" Line="60" Column="14" />
-      <File FileName="Assets\ScoreBoard\ScoreBoard.cs" Line="1" Column="1" />
-      <File FileName="Assets\Board\Board.cs" Line="1" Column="1" />
+      <File FileName="Assets\Game\GameManager.cs" Line="250" Column="3" />
+      <File FileName="Assets\Game\GestureInput.cs" Line="127" Column="22" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

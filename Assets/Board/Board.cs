@@ -110,4 +110,22 @@ public class Board : MonoBehaviour
 			yield return new WaitForSeconds (0.05f);
 		}
 	}
+
+	public void setResolution (bool isHighRes)
+	{
+		Transform border = transform.Find ("Border");
+		foreach (Transform t in border) {
+			Brick b = t.GetComponent<Brick> ();
+			if (b != null) {
+				b.setResolution(isHighRes);
+			}
+		}
+
+		foreach (Transform t in transform) {
+			Brick b = t.GetComponent<Brick> ();
+			if (b != null) {
+				b.setResolution(isHighRes);
+			}
+		}
+	}
 }

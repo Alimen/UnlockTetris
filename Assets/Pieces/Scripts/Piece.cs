@@ -19,14 +19,14 @@ public class Piece : MonoBehaviour
 	protected int direction = 0;
 	protected List<int> content = new List<int> ();
 
-	public virtual void initialize ()
+	public virtual void initialize (bool isHighRes)
 	{
 		board = GameObject.Find ("Board").GetComponent<Board> ();
 	}
 
 	public virtual void rotate () {}
 
-	protected void instantiateBricks ()
+	protected void instantiateBricks (bool isHighRes)
 	{
 		if (width <= 0) {
 			Debug.LogError ("Instantiating an un-initialized piece.");
@@ -42,7 +42,7 @@ public class Piece : MonoBehaviour
 					b = (Instantiate (brick) as Transform).GetComponent<Brick> ();
 					b.transform.parent = transform;
 					b.transform.localPosition = new Vector3 (j, (-1) * i, 0);
-					b.initialize (color);
+					b.initialize (color, isHighRes);
 					bricks.Add (b);
 				}
 			}
@@ -138,6 +138,13 @@ public class Piece : MonoBehaviour
 		}
 		Destroy (gameObject);
 		return true;
+	}
+	
+	public void setResolution (bool isHighRes)
+	{
+		foreach (Brick b in bricks) {
+			b.setResolution (isHighRes);
+		}
 	}
 
 	public void show ()

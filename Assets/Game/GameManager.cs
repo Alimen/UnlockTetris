@@ -7,16 +7,19 @@ public class GameManager : MonoBehaviour
 	// Component handlers
 	ScoreBoard scoreBoard;
 	Parameters parameters;
+	GestureInput gestureInput;
 
 	// Board dimension
 	Board board;
 	public Transform nxtPieceSpawnPoint;
+	bool highResolution = false;
 
 	// Pieces & prefabs
 	Piece curPiece = null, nxtPiece = null;
 	public List<Transform> pieces = new List<Transform> ();
 
 	// Timer
+	public bool pause = false;
 	int level;
 	int line;
 	float autoDownDelay;
@@ -34,6 +37,7 @@ public class GameManager : MonoBehaviour
 	{
 		scoreBoard = GameObject.Find ("ScoreBoard").GetComponent<ScoreBoard> ();
 		parameters = GameObject.Find ("Parameters").GetComponent<Parameters> ();
+		gestureInput = GetComponent<GestureInput> ();
 		board = GameObject.Find ("Board").GetComponent<Board> ();
 		parameters.initialize ();
 		StartCoroutine (game ());
@@ -41,36 +45,44 @@ public class GameManager : MonoBehaviour
 
 	void Update ()
 	{
+		gestureInput.updateKey ();
+
 		// Left arrow
-		if (Input.GetKeyDown (KeyCode.LeftArrow)) {
+		//if (Input.GetKeyDown (KeyCode.LeftArrow)) {
+		if (gestureInput.getKeyDown (KeyCode.LeftArrow)) {
 			leftKeyDown = true;
 			leftFlag = true;
 			leftDelay = startDelay;
 			leftTimer = 0;
 		}
-		if (Input.GetKeyUp (KeyCode.LeftArrow)) {
+		//if (Input.GetKeyUp (KeyCode.LeftArrow)) {
+		if (gestureInput.getKeyUp (KeyCode.LeftArrow)) {
 			leftKeyDown = false;
 		}
 		
 		// Right arrow
-		if (Input.GetKeyDown (KeyCode.RightArrow)) {
+		//if (Input.GetKeyDown (KeyCode.RightArrow)) {
+		if (gestureInput.getKeyDown (KeyCode.RightArrow)) {
 			rightKeyDown = true;
 			rightFlag = true;
 			rightDelay = startDelay;
 			rightTimer = 0;
 		}
-		if (Input.GetKeyUp (KeyCode.RightArrow)) {
+		///if (Input.GetKeyUp (KeyCode.RightArrow)) {
+		if (gestureInput.getKeyUp (KeyCode.RightArrow)) {
 			rightKeyDown = false;
 		}
 		
 		// Down arrow
-		if (Input.GetKeyDown (KeyCode.DownArrow)) {
+		//if (Input.GetKeyDown (KeyCode.DownArrow)) {
+		if (gestureInput.getKeyDown (KeyCode.DownArrow)) {
 			downKeyDown = true;
 			downFlag = true;
 			downDelay = startDelay;
 			downTimer = 0;
 		}
-		if (Input.GetKeyUp (KeyCode.DownArrow)) {
+		//if (Input.GetKeyUp (KeyCode.DownArrow)) {
+		if (gestureInput.getKeyUp (KeyCode.DownArrow)) {
 			downKeyDown = false;
 		}
 	}
@@ -116,7 +128,12 @@ public class GameManager : MonoBehaviour
 			autoDownTimer = 0;
 
 			while (true) {
-				if (Input.GetKeyDown (KeyCode.UpArrow)) {
+				while (pause) {
+					yield return null;
+				}
+
+				//if (Input.GetKeyDown (KeyCode.UpArrow)) {
+				if (gestureInput.getKeyDown (KeyCode.UpArrow)) {
 					curPiece.rotate ();
 				}
 
@@ -203,7 +220,7 @@ public class GameManager : MonoBehaviour
 
 		int r = Random.Range (0, pieces.Count);
 		nxtPiece = (Instantiate (pieces[r]) as Transform).GetComponent<Piece> ();
-		nxtPiece.initialize ();
+		nxtPiece.initialize (highResolution);
 		nxtPiece.transform.position = nxtPieceSpawnPoint.position;
 	}
 
@@ -217,5 +234,18 @@ public class GameManager : MonoBehaviour
 			curPiece.updatePosition ();
 			return false;
 		}
+	}
+
+	public void setResolution (bool high)
+	{
+		if (high == highResolution) {
+			return;
+		}
+		highResolution = high;
+
+		curPiece.setResolution (highResolution);
+		nxtPiece.setResolution (highResolution);
+		board.setResolution (highResolution);
+		scoreBoard.setResolution (highResolution);
 	}
 }

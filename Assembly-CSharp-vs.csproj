@@ -48,7 +48,9 @@
   <ItemGroup>
      <Compile Include="Assets\Board\Board.cs" />
      <Compile Include="Assets\Game\GameManager.cs" />
+     <Compile Include="Assets\Game\GestureInput.cs" />
      <Compile Include="Assets\Game\Parameters.cs" />
+     <Compile Include="Assets\Game\Store.cs" />
      <Compile Include="Assets\Pieces\Scripts\Brick.cs" />
      <Compile Include="Assets\Pieces\Scripts\Piece.cs" />
      <Compile Include="Assets\Pieces\Scripts\PieceI.cs" />
